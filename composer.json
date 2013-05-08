@@ -1,0 +1,18 @@
+{
+    "name": "drealecs/layeredcache",
+	"type": "library",
+	"description": "PHP layered cache implementation with variuous backends",
+	"keywords": ["cache", "layered cache", "cache layer"],
+	"authors": [
+        {
+            "name": "Alexandru Patranescu",
+            "email": "drealecs@gmail.com"
+        }
+	],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-0": { "LayeredCache": "lib/" }
+    }
+}
