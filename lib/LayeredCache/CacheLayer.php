@@ -12,7 +12,6 @@ class CacheLayer {
     const COMPRESSION_SNAPPY = 2;
     const COMPRESSION_LZF = 3;
     const COMPRESSION_GZ = 4;
-    const COMPRESSION_BZIP2 = 5;
 
     /**
      * @var Backend\Cache
@@ -31,10 +30,13 @@ class CacheLayer {
     
     protected static $allowedSerializations = array(self::SERIALIZATION_NONE, self::SERIALIZATION_JSON, self::SERIALIZATION_SERIALIZE);
 
-    protected static $allowedCompressions = array(self::COMPRESSION_NONE, self::COMPRESSION_LZ4, self::COMPRESSION_SNAPPY, self::COMPRESSION_LZF, self::COMPRESSION_GZ, self::COMPRESSION_BZIP2);
+    protected static $allowedCompressions = array(self::COMPRESSION_LZ4, self::COMPRESSION_SNAPPY, self::COMPRESSION_LZF, self::COMPRESSION_GZ, self::COMPRESSION_NONE);
+    
+    protected static $filteredAllowedCompressions = false;
 
     public function __construct($layerConfig, $serialization = self::SERIALIZATION_SERIALIZE)
     {
+        self::filterAllowedCompressions();
         if (!isset($layerConfig['backend'])) {
             throw new Exception('No backend specified');
         }
@@ -54,6 +56,41 @@ class CacheLayer {
         
         
         $this->serialization = $serialization;
+    }
+
+    /**
+     * Filter allowed compressions by checking the available functions loaded in php
+     */
+    protected static function filterAllowedCompressions()
+    {
+        if (!self::$filteredAllowedCompressions) {
+            foreach (self::$allowedCompressions as $compressionIndex => $compressions) {
+                switch ($compressions) {
+                    case self::COMPRESSION_LZ4:
+                        if (!function_exists('lz4_compress')) {
+                            unset(self::$allowedCompressions[$compressionIndex]);
+                        }
+                        break;
+                    case self::COMPRESSION_SNAPPY:
+                        if (!function_exists('snappy_compress')) {
+                            unset(self::$allowedCompressions[$compressionIndex]);
+                        }
+                        break;
+                    case self::COMPRESSION_LZF:
+                        if (!function_exists('lzf_compress')) {
+                            unset(self::$allowedCompressions[$compressionIndex]);
+                        }
+                        break;
+                    case self::COMPRESSION_GZ:
+                        if (!function_exists('gzcompress')) {
+                            unset(self::$allowedCompressions[$compressionIndex]);
+                        }
+                        break;
+                }
+            }
+            self::$allowedCompressions = array_values(self::$allowedCompressions);
+        }
+        return self::$allowedCompressions;
     }
 
     /**
@@ -77,6 +114,7 @@ class CacheLayer {
                     throw new Exception('Error serialization with serialize.');
                 }
                 break;
+            case self::SERIALIZATION_NONE:
             default:
                 $serializedData = $data;
         }
@@ -104,6 +142,7 @@ class CacheLayer {
                     throw new Exception('Error unserialization with unserialize.');
                 }
                 break;
+            case self::SERIALIZATION_NONE:
             default:
                 $unserializedData = $data;
         }
@@ -112,17 +151,82 @@ class CacheLayer {
 
     protected function compress($data)
     {
-        return $data;
+        switch ($this->compression) {
+            case self::COMPRESSION_LZ4:
+                $compressedData = @lz4_compress($data);
+                if (false === $compressedData) {
+                    throw new Exception('Error compressing with lz4_compress.');
+                }
+                break;
+            case self::COMPRESSION_SNAPPY:
+                $compressedData = @snappy_compress($data);
+                if (false === $compressedData) {
+                    throw new Exception('Error compressing with snappy_compress.');
+                }
+                break;
+            case self::COMPRESSION_LZF:
+                $compressedData = @lzf_compress($data);
+                if (false === $compressedData) {
+                    throw new Exception('Error compressing with lzf_compress.');
+                }
+                break;
+            case self::COMPRESSION_GZ:
+                $compressedData = @gzcompress($data);
+                if (false === $compressedData) {
+                    throw new Exception('Error compressing with gzcompress.');
+                }
+                break;
+            case self::COMPRESSION_NONE:
+            default:
+                $compressedData = $data;
+        }
+        return $compressedData;
     }
 
-    protected function uncompress($data)
+    protected function decompress($data)
     {
-        return $data;
+        switch ($this->compression) {
+            case self::COMPRESSION_LZ4:
+                $decompressedData = @lz4_uncompress($data);
+                if (false === $decompressedData) {
+                    throw new Exception('Error decompressing with lz4_uncompress.');
+                }
+                break;
+            case self::COMPRESSION_SNAPPY:
+                $decompressedData = @snappy_uncompress($data);
+                if (false === $decompressedData) {
+                    throw new Exception('Error decompressing with snappy_uncompress.');
+                }
+                break;
+            case self::COMPRESSION_LZF:
+                $decompressedData = @lzf_decompress($data);
+                if (false === $decompressedData) {
+                    throw new Exception('Error decompressing with lzf_decompress.');
+                }
+                break;
+            case self::COMPRESSION_GZ:
+                $decompressedData = @gzuncompress($data);
+                if (false === $decompressedData) {
+                    throw new Exception('Error decompressing with gzuncompress.');
+                }
+                break;
+            case self::COMPRESSION_NONE:
+            default:
+                $decompressedData = $data;
+        }
+        return $decompressedData;
     }
 
     public function set($id, $data, $lifetime = null)
     {
-        $this->cacheBackend->put($id, $data, $lifetime);
+        $data = $this->compress($this->serialize($data));
+        return $this->cacheBackend->put($id, $data, $lifetime);
+    }
+    
+    public function get($id)
+    {
+        $data = $this->cacheBackend->get($id);
+        return $this->unserialize($this->decompress($data));
     }
 
 }
