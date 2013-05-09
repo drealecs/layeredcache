@@ -98,6 +98,7 @@ class CacheLayer {
      *
      * @param mixed $data
      * @return mixed
+     * @throws Exception
      */
     protected function serialize($data)
     {
@@ -126,6 +127,7 @@ class CacheLayer {
      *
      * @param mixed $data
      * @return mixed
+     * @throws Exception
      */
     protected function unserialize($data)
     {
@@ -149,6 +151,13 @@ class CacheLayer {
         return $unserializedData;
     }
 
+    /**
+     * Compress data
+     * 
+     * @param string $data
+     * @return string
+     * @throws Exception
+     */
     protected function compress($data)
     {
         switch ($this->compression) {
@@ -183,6 +192,13 @@ class CacheLayer {
         return $compressedData;
     }
 
+    /**
+     * Decompress data
+     *
+     * @param string $data
+     * @return string
+     * @throws Exception
+     */
     protected function decompress($data)
     {
         switch ($this->compression) {
