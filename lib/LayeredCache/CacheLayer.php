@@ -2,7 +2,7 @@
 namespace LayeredCache;
 
 class CacheLayer {
-
+    
     const SERIALIZATION_NONE = 0;
     const SERIALIZATION_JSON = 1;
     const SERIALIZATION_SERIALIZE = 2;
@@ -12,52 +12,90 @@ class CacheLayer {
     const COMPRESSION_SNAPPY = 2;
     const COMPRESSION_LZF = 3;
     const COMPRESSION_GZ = 4;
-
+    
     /**
      * @var Backend\Cache
      */
     protected $cacheBackend;
-
+    
     /**
      * @var int
      */
     protected $serialization;
-
+    
     /**
      * @var int
      */
     protected $compression;
     
     protected static $allowedSerializations = array(self::SERIALIZATION_NONE, self::SERIALIZATION_JSON, self::SERIALIZATION_SERIALIZE);
-
+    
     protected static $allowedCompressions = array(self::COMPRESSION_LZ4, self::COMPRESSION_SNAPPY, self::COMPRESSION_LZF, self::COMPRESSION_GZ, self::COMPRESSION_NONE);
     
     protected static $filteredAllowedCompressions = false;
-
-    public function __construct($layerConfig, $serialization = self::SERIALIZATION_SERIALIZE)
+    
+    /**
+     * @param array $layerConfig
+     */
+    public function __construct($layerConfig)
     {
-        self::filterAllowedCompressions();
         if (!isset($layerConfig['backend'])) {
             throw new Exception('No backend specified');
         }
-        $backendName = $layerConfig['backend'];
-        if (!is_string($backendName)) {
-            throw new Exception('Backend must be a string.');
+        $backend = $layerConfig['backend'];
+        if (is_string($backend)) {
+            $backendClass = 'Backend\\' . ucfirst($backend);
+            if(!class_exists($backendClass)) {
+                throw new Exception("Unknown backend class: '{$backendClass}'.");
+            }
+            $this->cacheBackend = new $backendClass();
+            if (!($this->cacheBackend instanceof Backend\Cache)) {
+                throw new Exception('Backend created is not instance of Backend\Cache');
+            }
+        } elseif ($backend instanceof Backend\Cache) {
+            $this->cacheBackend = $backend;
+        } else {
+            throw new Exception('Backend must be a string or an instance of Backend\Cache');
         }
-        $backendClass = 'Backend\\' . ucfirst($backendName);
-        if(!class_exists($backendClass)) {
-            throw new Exception("Unknown backend class: '{$backendClass}'.");
+        
+        if (isset($layerConfig['serialization'])) {
+            $serialization = $layerConfig['serialization'];
+            if(!in_array($serialization, self::$allowedSerializations)) {
+                throw new Exception('Not available serialization in config');
+            }
+            $this->serialization = $serialization;
+        } else {
+            $this->serialization = self::SERIALIZATION_SERIALIZE;
         }
         
-        $this->cacheBackend = new $backendClass();
-        
-        $serialization = $layerConfig['serialization'];
-        
-        
-        
-        $this->serialization = $serialization;
+        self::filterAllowedCompressions();
+        if (isset($layerConfig['serialization'])) {
+            $compression = $layerConfig['compression'];
+            if(!in_array($compression, self::$allowedCompressions)) {
+                throw new Exception('Not available compression in config');
+            }
+            $this->compression = $compression;
+        } else {
+            $this->compression = self::$allowedCompressions[0];
+        }
     }
-
+    
+    
+    
+    
+    public function set($id, $data, $lifetime = null)
+    {
+        $data = $this->compress($this->serialize($data));
+        return $this->cacheBackend->put($id, $data, $lifetime);
+    }
+    
+    public function get($id)
+    {
+        $data = $this->cacheBackend->get($id);
+        return $this->unserialize($this->decompress($data));
+    }
+    
+    
     /**
      * Filter allowed compressions by checking the available functions loaded in php
      */
@@ -89,10 +127,11 @@ class CacheLayer {
                 }
             }
             self::$allowedCompressions = array_values(self::$allowedCompressions);
+            self::$filteredAllowedCompressions = true;
         }
         return self::$allowedCompressions;
     }
-
+    
     /**
      * Serialize the data to be put into cache
      *
@@ -150,7 +189,7 @@ class CacheLayer {
         }
         return $unserializedData;
     }
-
+    
     /**
      * Compress data
      * 
@@ -191,7 +230,7 @@ class CacheLayer {
         }
         return $compressedData;
     }
-
+    
     /**
      * Decompress data
      *
@@ -232,17 +271,5 @@ class CacheLayer {
         }
         return $decompressedData;
     }
-
-    public function set($id, $data, $lifetime = null)
-    {
-        $data = $this->compress($this->serialize($data));
-        return $this->cacheBackend->put($id, $data, $lifetime);
-    }
     
-    public function get($id)
-    {
-        $data = $this->cacheBackend->get($id);
-        return $this->unserialize($this->decompress($data));
-    }
-
 }
