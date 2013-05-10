@@ -83,10 +83,14 @@ class CacheLayer {
     
     
     
-    public function set($id, $data, $lifetime = null)
+    public function set($id, $data, $lifetime = null, $tags = array())
     {
         $data = $this->compress($this->serialize($data));
-        return $this->cacheBackend->put($id, $data, $lifetime);
+        if ($this->cacheBackend instanceof Backend\TaggableCache) {
+            return $this->cacheBackend->put($id, $data, $lifetime, $tags);
+        } else {
+            return $this->cacheBackend->put($id, $data, $lifetime);
+        }
     }
     
     public function get($id)
