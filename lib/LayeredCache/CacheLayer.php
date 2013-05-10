@@ -36,6 +36,7 @@ class CacheLayer {
     
     /**
      * @param array $layerConfig
+     * @throws Exception
      */
     public function __construct($layerConfig)
     {
