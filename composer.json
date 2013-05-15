@@ -3,6 +3,7 @@
 	"type": "library",
 	"description": "PHP layered cache implementation with various backends",
 	"keywords": ["cache", "layered cache", "cache layer"],
+    "license": "MIT",
 	"authors": [
         {
             "name": "Alexandru Patranescu",
