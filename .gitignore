@@ -1,2 +1,5 @@
 #IDEs
 /.idea
+
+#Composer's vendor folder
+/vendor
