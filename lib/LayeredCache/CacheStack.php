@@ -1,8 +1,8 @@
 <?php
 namespace LayeredCache;
 
-class CacheStack {
-   
+class CacheStack
+{
     /**
      * @var CacheLayer[] Array of cache layers
      */

@@ -10,7 +10,7 @@ interface TaggableCache extends Cache
      * @param string[] $tags A set of tags for the cache.
      * @return boolean true if the entry was successfully stored, false otherwise.
      */
-    function put($id, $data, $lifeTime = 0, $tags = array());
+    public function putWithTags($id, $data, $tags = array(), $lifeTime = 0);
 
     /**
      * @param string $id The cache id.

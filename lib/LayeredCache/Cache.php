@@ -1,8 +1,8 @@
 <?php
 namespace LayeredCache;
 
-class Cache {
-    
+class Cache
+{
     protected $stacks = array();
     
     

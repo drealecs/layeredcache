@@ -7,13 +7,13 @@ interface Cache
      * @param string $id The id of the cache entry to fetch.
      * @return string|null The cached data or null, if no cache entry exists for the given id.
      */
-    function get($id);
+    public function get($id);
 
     /**
      * @param string $id The cache id of the entry to check for.
      * @return boolean true or false if a cache entry exists or not for the given cache id.
      */
-    function contains($id);
+    public function contains($id);
 
     /**
      * @param string $id The cache id.
@@ -21,39 +21,28 @@ interface Cache
      * @param int $lifeTime The cache lifetime in seconds (0 => infinite).
      * @return boolean true if the entry was successfully stored, false otherwise.
      */
-    function put($id, $data, $lifeTime = 0);
+    public function put($id, $data, $lifeTime = 0);
 
     /**
      * @param string $id The cache id.
      * @return boolean true if the entry was successfully incremented, false otherwise.
      */
-    function increment($id);
+    public function increment($id);
 
     /**
      * @param string $id The cache id.
      * @return boolean true if the entry was successfully decremented, false otherwise.
      */
-    function decrement($id);
+    public function decrement($id);
 
-    /**
-     * @param string $id The cache id.
-     * @return boolean true if the entry lifetime was successfully reset, false otherwise.
-     */
-    function touch($id);
-    
     /**
      * @param string $id The cache id.
      * @return boolean true if the entry was successfully deleted, false otherwise.
      */
-    function remove($id);
+    public function remove($id);
     
     /**
      * @return boolean true if the entry was successfully flushed, false otherwise.
      */
-    function flush();
-    
-    /**
-     * @return array
-     */
-    function getCapabilities();
+    public function flush();
 }

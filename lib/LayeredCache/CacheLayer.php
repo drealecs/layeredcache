@@ -1,8 +1,8 @@
 <?php
 namespace LayeredCache;
 
-class CacheLayer {
-    
+class CacheLayer
+{
     const SERIALIZATION_NONE = 0;
     const SERIALIZATION_JSON = 1;
     const SERIALIZATION_SERIALIZE = 2;
@@ -88,7 +88,7 @@ class CacheLayer {
     {
         $data = $this->compress($this->serialize($data));
         if ($this->cacheBackend instanceof Backend\TaggableCache) {
-            return $this->cacheBackend->put($id, $data, $lifetime, $tags);
+            return $this->cacheBackend->putWithTags($id, $data, $tags, $lifetime);
         } else {
             return $this->cacheBackend->put($id, $data, $lifetime);
         }
