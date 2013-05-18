@@ -37,8 +37,8 @@ abstract class CacheBackendTest extends LayeredCacheTest
         $cacheBackend = $this->getCacheBackend();
 
         $cacheBackend->put('test1', 'test1 text');
-        $cacheBackend->put('test2', 'test1 text');
-        $cacheBackend->put('test3', 'test1 text');
+        $cacheBackend->put('test2', 'test2 text');
+        $cacheBackend->put('test3', 'test3 text');
         $cacheBackend->flush();
         $this->assertFalse($cacheBackend->contains('test1'));
         $this->assertFalse($cacheBackend->contains('test2'));
