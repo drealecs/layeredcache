@@ -1,16 +1,5 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Administrator
- * Date: 5/11/13
- * Time: 7:48 AM
- * To change this template use File | Settings | File Templates.
- */
-
 namespace LayeredCache\Backend;
-
-
-use string;
 
 class Memory implements Cache, TaggableCache
 {
@@ -30,6 +19,7 @@ class Memory implements Cache, TaggableCache
         if (null !== $element) {
             return $element['data'];
         }
+        return null;
     }
 
     public function contains($id)
@@ -96,7 +86,7 @@ class Memory implements Cache, TaggableCache
 
     public function putWithTags($id, $data, $tags = array(), $lifeTime = 0)
     {
-        $this->put(id, $data, $lifeTime);
+        $this->put($id, $data, $lifeTime);
         $this->setTags($id, $tags);
     }
 
