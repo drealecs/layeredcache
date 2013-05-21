@@ -45,16 +45,13 @@ class Memcache implements Cache
             if (!isset($server['port']) || !is_numeric($server['port'])) {
                 throw new Exception('Memcache: invalid port specified for server');
             }
-            $addResult = @$this->memcache->addServer($server['host'], (int)$server['port']);
-            if (!$addResult) {
-                throw new Exception('Memcache: unable to add server ' . $server['host'] . ':' . $server['port']);
-            }
+            @$this->memcache->addServer($server['host'], (int)$server['port']);
         }
     }
     
     function put($id, $data, $lifeTime = 0)
     {
-        return @$this->memcache->set($id, $data, 65536, $lifeTime);
+        return @$this->memcache->set($id, $data, 1 << 16, $lifeTime);
     }
     
     function get($id)

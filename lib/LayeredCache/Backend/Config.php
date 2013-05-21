@@ -36,6 +36,5 @@ class Config
         if (isset($this->options[$option])) {
             return $this->options[$option];
         }
-        return null;
     }
 }
