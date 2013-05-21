@@ -2,6 +2,7 @@
 namespace LayeredCache\Backend;
 
 use LayeredCache\Exception;
+use LayeredCache\Config;
 
 class Memcache implements Cache
 {
@@ -34,18 +35,18 @@ class Memcache implements Cache
     private function setupMemcache()
     {
         $this->memcache = new \Memcache();
-        $servers = $this->config->getOption('servers');
-        if (!is_array($servers) || count($servers) < 1) {
+        $servers = $this->config->servers;
+        if ((!$servers instanceof Config) || count($servers) < 1) {
             throw new Exception('Memcache: no server specified in servers config');
         }
         foreach ($servers as $server) {
-            if (!isset($server['host']) || !is_string($server['host'])) {
+            if (is_null($server->host) || !is_string($server->host)) {
                 throw new Exception('Memcache: invalid host specified for server');
             }
-            if (!isset($server['port']) || !is_numeric($server['port'])) {
+            if (is_null($server->port) || !is_numeric($server->port)) {
                 throw new Exception('Memcache: invalid port specified for server');
             }
-            @$this->memcache->addServer($server['host'], (int)$server['port']);
+            @$this->memcache->addServer($server->host, (int)$server->port);
         }
     }
     

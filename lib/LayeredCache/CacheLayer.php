@@ -35,21 +35,25 @@ class CacheLayer
     protected static $filteredAllowedCompressions = false;
     
     /**
-     * @param array $layerConfig
+     * @param Config $layerConfig
      * @throws Exception
      */
     public function __construct($layerConfig)
     {
-        if (!isset($layerConfig['backend'])) {
+        if (!$layerConfig instanceof Config) {
+            $layerConfig = new Config($layerConfig);
+        }
+        if (is_null($layerConfig->backend)) {
             throw new Exception('No backend specified');
         }
-        $backend = $layerConfig['backend'];
+        $backend = $layerConfig->backend;
         if (is_string($backend)) {
             $backendClass = 'Backend\\' . ucfirst($backend);
             if(!class_exists($backendClass)) {
                 throw new Exception("Unknown backend class: '{$backendClass}'.");
             }
-            $this->cacheBackend = new $backendClass();
+            $backendOptions = $layerConfig->backendOptions;
+            $this->cacheBackend = new $backendClass($backendOptions);
             if (!($this->cacheBackend instanceof Backend\Cache)) {
                 throw new Exception('Backend created is not instance of Backend\Cache');
             }
@@ -59,8 +63,8 @@ class CacheLayer
             throw new Exception('Backend must be a string or an instance of Backend\Cache');
         }
         
-        if (isset($layerConfig['serialization'])) {
-            $serialization = $layerConfig['serialization'];
+        if (!is_null($layerConfig->serialization)) {
+            $serialization = $layerConfig->serialization;
             if(!in_array($serialization, self::$allowedSerializations)) {
                 throw new Exception('Not available serialization in config');
             }
@@ -70,8 +74,8 @@ class CacheLayer
         }
         
         self::filterAllowedCompressions();
-        if (isset($layerConfig['serialization'])) {
-            $compression = $layerConfig['compression'];
+        if (!is_null($layerConfig->compression)) {
+            $compression = $layerConfig->compression;
             if(!in_array($compression, self::$allowedCompressions)) {
                 throw new Exception('Not available compression in config');
             }

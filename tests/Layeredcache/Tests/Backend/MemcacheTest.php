@@ -1,7 +1,7 @@
 <?php
 namespace LayeredCache\Tests\Backend;
 
-use LayeredCache\Backend\Config;
+use LayeredCache\Config;
 use LayeredCache\Backend\Memcache;
 use LayeredCache\Tests\CacheBackendTest;
 
