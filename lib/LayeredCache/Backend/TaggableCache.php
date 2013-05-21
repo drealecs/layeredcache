@@ -1,7 +1,7 @@
 <?php
 namespace LayeredCache\Backend;
 
-interface TaggableCache extends Cache
+interface TaggableCache
 {
     /**
      * @param string $id The cache id.
@@ -39,6 +39,18 @@ interface TaggableCache extends Cache
      */
     public function getTags($id);
 
+	/**
+	 * @param string[] $tags
+	 * @return string[] Ids
+	 */
+	public function getIdsByTags(array $tags);
+
+	/**
+	 * @param string[] $tags
+	 * @return string[] Ids
+	 */
+	public function getIdsByAnyTags(array $tags);
+	
     /**
      * @param string[] $tags
      * @return bool
