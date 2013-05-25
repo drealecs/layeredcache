@@ -19,6 +19,11 @@ class CacheLayer
     protected $cacheBackend;
     
     /**
+     * @var int default cache lifetime
+     */
+    protected $lifetime = 0;
+    
+    /**
      * @var int
      */
     protected $serialization;
@@ -63,6 +68,10 @@ class CacheLayer
             throw new Exception('Backend must be a string or an instance of Backend\Cache');
         }
         
+        if (!is_null($layerConfig->lifetime)) {
+            $this->lifetime = $layerConfig->lifetime;
+        }
+        
         if (!is_null($layerConfig->serialization)) {
             $serialization = $layerConfig->serialization;
             if(!in_array($serialization, self::$allowedSerializations)) {
@@ -85,12 +94,19 @@ class CacheLayer
         }
     }
     
-    
-    
-    
+    /**
+     * @param string $id
+     * @param mixed $data
+     * @param int $lifetime
+     * @param string[] $tags
+     * @return bool
+     */
     public function set($id, $data, $lifetime = null, $tags = array())
     {
         $data = $this->compress($this->serialize($data));
+        if (!isset($lifetime)) {
+            $lifetime = $this->lifetime;
+        }
         if ($this->cacheBackend instanceof Backend\TaggableCache) {
             return $this->cacheBackend->putWithTags($id, $data, $tags, $lifetime);
         } else {
@@ -98,12 +114,15 @@ class CacheLayer
         }
     }
     
+    /**
+     * @param string $id
+     * @return mixed
+     */
     public function get($id)
     {
         $data = $this->cacheBackend->get($id);
         return $this->unserialize($this->decompress($data));
     }
-    
     
     /**
      * Filter allowed compressions by checking the available functions loaded in php
