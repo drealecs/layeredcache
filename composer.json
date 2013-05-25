@@ -1,5 +1,5 @@
 {
-    "name": "drealecs/layeredcache",
+    "name": "layeredcache/layeredcache",
 	"type": "library",
 	"description": "PHP layered cache implementation with various backends",
 	"keywords": ["cache", "layered cache", "cache layer"],
