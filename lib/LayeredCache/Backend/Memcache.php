@@ -15,7 +15,7 @@ class Memcache implements Cache
      * @var Config
      */
     private $config;
-    
+                
     /**
      * @param Config $options
      */
@@ -28,7 +28,7 @@ class Memcache implements Cache
         }
         $this->setupMemcache();
     }
-    
+                
     /**
      * @throws \Exception
      */
@@ -49,13 +49,13 @@ class Memcache implements Cache
             @$this->memcache->addServer($server->host, (int)$server->port);
         }
     }
-    
-    function put($id, $data, $lifeTime = 0)
+                
+    public function put($id, $data, $lifeTime = 0)
     {
         return @$this->memcache->set($id, $data, 1 << 16, $lifeTime);
     }
-    
-    function get($id)
+
+    public function get($id)
     {
         $flags = null;
         $result = @$this->memcache->get($id, $flags);
@@ -64,30 +64,29 @@ class Memcache implements Cache
         }
         return $result;
     }
-    
-    function contains($id)
+
+    public function contains($id)
     {
         return null !== $this->get($id);
     }
 
-    function increment($id)
+    public function increment($id)
     {
         return false !== @$this->memcache->increment($id);
     }
-    
-    function decrement($id)
+
+    public function decrement($id)
     {
         return false !== @$this->memcache->decrement($id);
     }
 
-    function remove($id)
+    public function remove($id)
     {
         return (bool)@$this->memcache->delete($id);
     }
 
-    function flush()
+    public function flush()
     {
         return (bool)@$this->memcache->flush();
     }
-
 }

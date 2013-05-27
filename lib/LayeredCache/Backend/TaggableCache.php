@@ -39,18 +39,18 @@ interface TaggableCache
      */
     public function getTags($id);
 
-	/**
-	 * @param string[] $tags
-	 * @return string[] Ids
-	 */
-	public function getIdsByTags(array $tags);
+    /**
+     * @param string[] $tags
+     * @return string[] Ids
+     */
+    public function getIdsByTags(array $tags);
 
-	/**
-	 * @param string[] $tags
-	 * @return string[] Ids
-	 */
-	public function getIdsByAnyTags(array $tags);
-	
+    /**
+     * @param string[] $tags
+     * @return string[] Ids
+     */
+    public function getIdsByAnyTags(array $tags);
+    
     /**
      * @param string[] $tags
      * @return bool
@@ -62,5 +62,4 @@ interface TaggableCache
      * @return bool
      */
     public function clearByAnyTags(array $tags);
-
 }

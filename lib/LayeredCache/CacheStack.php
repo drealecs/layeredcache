@@ -13,20 +13,15 @@ class CacheStack
      */
     public function __construct($stackConfig)
     {
-        foreach($stackConfig as $layerConfig) {
+        foreach ($stackConfig as $layerConfig) {
             $this->layers[] = new CacheLayer($layerConfig);
         }
     }
     
-
-    
-    
     public function set($id, $data, $lifetime = null)
     {
-        foreach($this->layers as $layer) {
+        foreach ($this->layers as $layer) {
             $layer->set($id, $data, $lifetime);
         }
     }
-    
-    
 }

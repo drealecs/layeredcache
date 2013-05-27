@@ -71,7 +71,7 @@ class Memory implements Cache, TaggableCache
         $this->data = array();
         $this->tags = array();
     }
-    
+        
     private function checkAndGetElement($id)
     {
         if (isset($this->data[$id])) {
@@ -88,7 +88,7 @@ class Memory implements Cache, TaggableCache
     {
         $this->put($id, $data, $lifeTime);
         $this->setTags($id, $tags);
-	    return true;
+        return true;
     }
 
     public function addTags($id, array $tags)
@@ -110,11 +110,11 @@ class Memory implements Cache, TaggableCache
 
     public function setTags($id, array $tags)
     {
-	    $existingTags = $this->getTags($id);
-	    $tagsToAdd = array_diff($tags, $existingTags);
-	    $tagsToRemove = array_diff($existingTags, $tags);
-	    $this->addTags($id, $tagsToAdd);
-	    $this->removeTags($id, $tagsToRemove);
+        $existingTags = $this->getTags($id);
+        $tagsToAdd = array_diff($tags, $existingTags);
+        $tagsToRemove = array_diff($existingTags, $tags);
+        $this->addTags($id, $tagsToAdd);
+        $this->removeTags($id, $tagsToRemove);
     }
 
     public function getTags($id)
@@ -124,41 +124,41 @@ class Memory implements Cache, TaggableCache
 
     public function clearByTags(array $tags)
     {
-	    foreach($this->getIdsByTags($tags) as $id) {
-		    $this->remove($id);
-	    }
-	    return true;
+        foreach ($this->getIdsByTags($tags) as $id) {
+            $this->remove($id);
+        }
+        return true;
     }
 
     public function clearByAnyTags(array $tags)
     {
-	    foreach($this->getIdsByAnyTags($tags) as $id) {
-		    $this->remove($id);
-	    }
-	    return true;
+        foreach ($this->getIdsByAnyTags($tags) as $id) {
+            $this->remove($id);
+        }
+        return true;
     }
 
-	public function getIdsByTags(array $tags)
-	{
-		$idsByTag = null;
-		foreach ($tags as $tag) {
-			$ids = array_keys($this->tags[$tag]);
-			if (!isset($idsByTag)) {
-				$idsByTag = $ids;
-			} else {
-				$idsByTag = array_intersect($idsByTag, $ids);
-			}
-		}
-		return (array)$idsByTag;
-	}
+    public function getIdsByTags(array $tags)
+    {
+        $idsByTag = null;
+        foreach ($tags as $tag) {
+            $ids = array_keys($this->tags[$tag]);
+            if (!isset($idsByTag)) {
+                $idsByTag = $ids;
+            } else {
+                $idsByTag = array_intersect($idsByTag, $ids);
+            }
+        }
+        return (array)$idsByTag;
+    }
 
-	public function getIdsByAnyTags(array $tags)
-	{
-		$idsByTag = array();
-		foreach ($tags as $tag) {
-			$ids = array_keys($this->tags[$tag]);
-			$idsByTag = array_merge($idsByTag, $ids);
-		}
-		return array_unique($idsByTag);
-	}
+    public function getIdsByAnyTags(array $tags)
+    {
+        $idsByTag = array();
+        foreach ($tags as $tag) {
+            $ids = array_keys($this->tags[$tag]);
+            $idsByTag = array_merge($idsByTag, $ids);
+        }
+        return array_unique($idsByTag);
+    }
 }

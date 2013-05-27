@@ -6,39 +6,49 @@ class CacheLayer
     const SERIALIZATION_NONE = 0;
     const SERIALIZATION_JSON = 1;
     const SERIALIZATION_SERIALIZE = 2;
-    
+        
     const COMPRESSION_NONE = 0;
     const COMPRESSION_LZ4 = 1;
     const COMPRESSION_SNAPPY = 2;
     const COMPRESSION_LZF = 3;
     const COMPRESSION_GZ = 4;
-    
+        
     /**
      * @var Backend\Cache
      */
     protected $cacheBackend;
-    
+        
     /**
      * @var int default cache lifetime
      */
     protected $lifetime = 0;
-    
+        
     /**
      * @var int
      */
     protected $serialization;
-    
+        
     /**
      * @var int
      */
     protected $compression;
-    
-    protected static $allowedSerializations = array(self::SERIALIZATION_NONE, self::SERIALIZATION_JSON, self::SERIALIZATION_SERIALIZE);
-    
-    protected static $allowedCompressions = array(self::COMPRESSION_LZ4, self::COMPRESSION_SNAPPY, self::COMPRESSION_LZF, self::COMPRESSION_GZ, self::COMPRESSION_NONE);
-    
+        
+    protected static $allowedSerializations = array(
+        self::SERIALIZATION_NONE,
+        self::SERIALIZATION_JSON,
+        self::SERIALIZATION_SERIALIZE
+    );
+        
+    protected static $allowedCompressions = array(
+        self::COMPRESSION_LZ4,
+        self::COMPRESSION_SNAPPY,
+        self::COMPRESSION_LZF,
+        self::COMPRESSION_GZ,
+        self::COMPRESSION_NONE
+    );
+        
     protected static $filteredAllowedCompressions = false;
-    
+        
     /**
      * @param Config $layerConfig
      * @throws Exception
@@ -54,7 +64,7 @@ class CacheLayer
         $backend = $layerConfig->backend;
         if (is_string($backend)) {
             $backendClass = 'Backend\\' . ucfirst($backend);
-            if(!class_exists($backendClass)) {
+            if (!class_exists($backendClass)) {
                 throw new Exception("Unknown backend class: '{$backendClass}'.");
             }
             $backendOptions = $layerConfig->backendOptions;
@@ -67,25 +77,25 @@ class CacheLayer
         } else {
             throw new Exception('Backend must be a string or an instance of Backend\Cache');
         }
-        
+                
         if (!is_null($layerConfig->lifetime)) {
             $this->lifetime = $layerConfig->lifetime;
         }
-        
+                
         if (!is_null($layerConfig->serialization)) {
             $serialization = $layerConfig->serialization;
-            if(!in_array($serialization, self::$allowedSerializations)) {
+            if (!in_array($serialization, self::$allowedSerializations)) {
                 throw new Exception('Not available serialization in config');
             }
             $this->serialization = $serialization;
         } else {
             $this->serialization = self::SERIALIZATION_SERIALIZE;
         }
-        
+                
         self::filterAllowedCompressions();
         if (!is_null($layerConfig->compression)) {
             $compression = $layerConfig->compression;
-            if(!in_array($compression, self::$allowedCompressions)) {
+            if (!in_array($compression, self::$allowedCompressions)) {
                 throw new Exception('Not available compression in config');
             }
             $this->compression = $compression;
@@ -93,7 +103,7 @@ class CacheLayer
             $this->compression = self::$allowedCompressions[0];
         }
     }
-    
+        
     /**
      * @param string $id
      * @param mixed $data
@@ -113,7 +123,7 @@ class CacheLayer
             return $this->cacheBackend->put($id, $data, $lifetime);
         }
     }
-    
+        
     /**
      * @param string $id
      * @return mixed
@@ -123,7 +133,7 @@ class CacheLayer
         $data = $this->cacheBackend->get($id);
         return $this->unserialize($this->decompress($data));
     }
-    
+        
     /**
      * Filter allowed compressions by checking the available functions loaded in php
      */
@@ -159,7 +169,7 @@ class CacheLayer
         }
         return self::$allowedCompressions;
     }
-    
+        
     /**
      * Serialize the data to be put into cache
      *
@@ -188,7 +198,7 @@ class CacheLayer
         }
         return $serializedData;
     }
-    
+        
     /**
      * Unserialize the retrieved cached data
      *
@@ -217,7 +227,7 @@ class CacheLayer
         }
         return $unserializedData;
     }
-    
+        
     /**
      * Compress data
      * 
@@ -258,7 +268,7 @@ class CacheLayer
         }
         return $compressedData;
     }
-    
+        
     /**
      * Decompress data
      *
@@ -299,5 +309,4 @@ class CacheLayer
         }
         return $decompressedData;
     }
-    
 }
