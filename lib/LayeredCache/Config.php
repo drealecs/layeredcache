@@ -45,7 +45,7 @@ class Config implements \IteratorAggregate, \Countable
     {
         $result = $this->getOption($option);
         if (is_array($result) || ($result instanceof Traversable)) {
-            return new self($result);
+            return new static($result);
         }
         return $result;
     }
@@ -53,12 +53,8 @@ class Config implements \IteratorAggregate, \Countable
     public function getIterator()
     {
         $options = array();
-        foreach ($this->options as $optionName => $option) {
-            if (is_array($option) || ($option instanceof Traversable)) {
-                $options[$optionName] = new self($option);
-            } else {
-                $options[$optionName] = $option;
-            }
+        foreach (array_keys($this->options) as $optionName) {
+            $options[$optionName] = $this->__get($optionName);
         }
         return new \ArrayIterator($options);
     }
