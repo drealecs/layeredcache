@@ -15,5 +15,8 @@
     },
     "autoload": {
         "psr-0": { "LayeredCache": "lib/" }
+    },
+    "config": {
+        "use-include-path": true
     }
 }
