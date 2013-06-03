@@ -125,6 +125,7 @@ class Memory implements Cache, TaggableCache
     public function clearByTags(array $tags)
     {
         foreach ($this->getIdsByTags($tags) as $id) {
+            $this->removeTags($id, $this->getTags($id));
             $this->remove($id);
         }
         return true;
@@ -133,6 +134,7 @@ class Memory implements Cache, TaggableCache
     public function clearByAnyTags(array $tags)
     {
         foreach ($this->getIdsByAnyTags($tags) as $id) {
+            $this->removeTags($id, $this->getTags($id));
             $this->remove($id);
         }
         return true;
