@@ -3,6 +3,9 @@ php:
   - 5.5
   - 5.4
   - 5.3
+services:
+  - memcached
+  - redis-server
 before_script:
   - phpenv config-add travis-config.ini
   - printf "\n" | pecl install apcu-4.0.2
