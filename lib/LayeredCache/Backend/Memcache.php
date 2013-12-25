@@ -4,38 +4,17 @@ namespace LayeredCache\Backend;
 use LayeredCache\Exception;
 use LayeredCache\Config;
 
-class Memcache implements Cache
+class Memcache extends CommonAbstract implements Cache
 {
     /**
      * @var \Memcache
      */
     private $memcache;
 
-    /**
-     * @var Config
-     */
-    private $config;
-                
-    /**
-     * @param Config $options
-     */
-    public function __construct($options)
-    {
-        if ($options instanceof Config) {
-            $this->config = $options;
-        } else {
-            $this->config = new Config($options);
-        }
-        $this->setupMemcache();
-    }
-                
-    /**
-     * @throws \Exception
-     */
-    private function setupMemcache()
+    protected function setup($config)
     {
         $this->memcache = new \Memcache();
-        $servers = $this->config->servers;
+        $servers = $config->servers;
         if ((!$servers instanceof Config) || count($servers) < 1) {
             throw new Exception('Memcache: no server specified in servers config');
         }
