@@ -1,43 +1,29 @@
 <?php
 namespace LayeredCache\Backend;
 
-use LayeredCache\Config;
 use LayeredCache\Exception;
 use Predis\Client as PredisClient;
 use Predis\ResponseErrorInterface;
 
-class Predis implements Cache, TaggableCache{
+class Predis extends CommonAbstract implements Cache, TaggableCache
+{
 
     /**
      * @var PredisClient
      */
     private $redis;
-    
-    
-    /**
-     * @param Config $options
-     */
-    public function __construct($options)
+
+    protected function setup($config)
     {
-        if ($options instanceof Config) {
-            $this->config = $options;
-        } else {
-            $this->config = new Config($options);
-        }
-        $this->setupRedis();
-    }
-    
-    public function setupRedis()
-    {
-        $host = $this->config->host;
+        $host = $config->host;
         if (is_null($host) || !is_string($host)) {
             throw new Exception('Predis: invalid host specified for server');
         }
-        $port = $this->config->port;
+        $port = $config->port;
         if (is_null($port) || !is_numeric($port)) {
             throw new Exception('Memcache: invalid port specified for server');
         }
-        $database = $this->config->database;
+        $database = $config->database;
         if (is_null($database) || !is_numeric($database)) {
             $database = 0;
         }
