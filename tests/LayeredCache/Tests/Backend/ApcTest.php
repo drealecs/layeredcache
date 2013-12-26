@@ -10,4 +10,8 @@ class ApcTest extends CacheBackendTest
     {
         return new Apc();
     }
+
+    public function testPutGetWithExpire()
+    {
+    }
 }
